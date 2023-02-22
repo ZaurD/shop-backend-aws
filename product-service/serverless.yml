@@ -1,0 +1,46 @@
+service: product-service
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-auto-swagger
+  - serverless-webpack
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+
+functions:
+  getProductsList:
+    handler: handler.getProductsList
+    events:
+      - httpApi:
+          method: get
+          path: /products
+          cors: true
+          responseData: {
+            200: {
+              description: 'successful Api Response',
+              bodyType: 'Product',
+            }
+          }  
+
+  getProductsById:
+    handler: handler.getProductsById
+    events:
+      - http:
+          path: products/{productId}
+          method: get
+          cors: true
+          responseData: {
+            200: {
+              description: 'successful Api Response',
+              bodyType: 'Product',
+            },
+            404: {
+              description: 'Product not found'
+            }
+          }  
+
