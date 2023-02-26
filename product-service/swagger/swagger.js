@@ -2,7 +2,7 @@
             module.exports = {
   "swagger": "2.0",
   "info": {
-    "title": "product-service",
+    "title": "products-service",
     "version": "1"
   },
   "paths": {
@@ -24,6 +24,9 @@
             "schema": {
               "$ref": "#/definitions/Product"
             }
+          },
+          "500": {
+            "description": "An error occurred while retrieving products."
           }
         }
       }
@@ -56,6 +59,9 @@
           },
           "404": {
             "description": "Product not found"
+          },
+          "500": {
+            "description": "Error getting product"
           }
         }
       }

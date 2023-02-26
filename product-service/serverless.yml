@@ -1,4 +1,4 @@
-service: product-service
+service: products-service
 
 frameworkVersion: '3'
 
@@ -11,12 +11,23 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: eu-west-1
-
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Get*
+        - dynamodb:Scan*
+      Resource: '*'
+custom:
+    autoswagger:
+        apiType: 'http'
 functions:
   getProductsList:
     handler: handler.getProductsList
+    environment:
+      PRODUCTS_TABLE: products
+      STOCKS_TABLE: stocks
     events:
-      - httpApi:
+      - http:
           method: get
           path: /products
           cors: true
@@ -24,16 +35,22 @@ functions:
             200: {
               description: 'successful Api Response',
               bodyType: 'Product',
+            },
+            500: {
+              description: 'An error occurred while retrieving products.',
             }
           }  
 
   getProductsById:
     handler: handler.getProductsById
+    environment:
+      PRODUCTS_TABLE: products
+      STOCKS_TABLE: stocks
     events:
       - http:
           path: products/{productId}
-          method: get
           cors: true
+          method: get
           responseData: {
             200: {
               description: 'successful Api Response',
@@ -41,6 +58,9 @@ functions:
             },
             404: {
               description: 'Product not found'
+            },
+            500: {
+              description: 'Error getting product'
             }
           }  
 
