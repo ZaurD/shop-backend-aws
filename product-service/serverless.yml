@@ -16,6 +16,7 @@ provider:
       Action:
         - dynamodb:Get*
         - dynamodb:Scan*
+        - dynamodb:PutItem
       Resource: '*'
 custom:
     autoswagger:
@@ -64,3 +65,25 @@ functions:
             }
           }  
 
+  createProduct:
+    handler: handler.createProduct
+    environment:
+      PRODUCTS_TABLE: products
+      STOCKS_TABLE: stocks
+    events:
+      - http:
+          path: products
+          method: post
+          cors: true
+          responseData: {
+            200: {
+              description: 'Product created successfully',
+              bodyType: 'Product',
+            },
+            400: {
+              description: 'Error creating product, product data is invalid',
+            },
+            500: {
+              description: 'Error creating product',
+            }
+          }

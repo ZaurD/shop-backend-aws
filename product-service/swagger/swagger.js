@@ -29,6 +29,32 @@
             "description": "An error occurred while retrieving products."
           }
         }
+      },
+      "post": {
+        "summary": "createProduct",
+        "description": "",
+        "operationId": "createProduct.post.products",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Product created successfully",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          "400": {
+            "description": "Error creating product, product data is invalid"
+          },
+          "500": {
+            "description": "Error creating product"
+          }
+        }
       }
     },
     "/products/{productId}": {
