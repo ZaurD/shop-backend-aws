@@ -46,7 +46,7 @@ functions:
   getProductsById:
     handler: handler.getProductsById
     environment:
-      PRODUCTS_TABLE: product
+      PRODUCTS_TABLE: products
       STOCKS_TABLE: stocks
     events:
       - http:
