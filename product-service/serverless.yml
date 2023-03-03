@@ -1,6 +1,6 @@
 service: products-service
 
-frameworkVersion: '3'
+frameworkVersion: '3.28.1'
 
 plugins:
   - serverless-auto-swagger
@@ -21,6 +21,7 @@ provider:
 custom:
     autoswagger:
         apiType: 'http'
+        
 functions:
   getProductsList:
     handler: handler.getProductsList
@@ -45,7 +46,7 @@ functions:
   getProductsById:
     handler: handler.getProductsById
     environment:
-      PRODUCTS_TABLE: products
+      PRODUCTS_TABLE: product
       STOCKS_TABLE: stocks
     events:
       - http:

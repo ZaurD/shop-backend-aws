@@ -20,7 +20,7 @@ export const createProduct = async (event) => {
   const productId = uuid.v4();
 
   const productParams = {
-    TableName: process.env.PRODUCTS_TABLE_NAME,
+    TableName: process.env.PRODUCTS_TABLE,
     Item: {
       id: productId,
       title,
@@ -31,7 +31,7 @@ export const createProduct = async (event) => {
   };
 
   const stockParams = {
-    TableName: process.env.STOCKS_TABLE_NAME,
+    TableName: process.env.STOCKS_TABLE,
     Item: {
       id: productId,
       count,
@@ -54,6 +54,11 @@ export const createProduct = async (event) => {
 
     return {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+      },
       body: JSON.stringify({
         message: "Product created successfully",
         product: {
