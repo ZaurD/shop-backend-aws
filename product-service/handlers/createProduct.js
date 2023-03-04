@@ -33,7 +33,7 @@ export const createProduct = async (event) => {
   const stockParams = {
     TableName: process.env.STOCKS_TABLE,
     Item: {
-      id: productId,
+      product_id: productId,
       count,
     },
   };

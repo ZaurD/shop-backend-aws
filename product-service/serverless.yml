@@ -11,12 +11,13 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: eu-west-1
+  environment:
+    PRODUCTS_TABLE: products
+    STOCKS_TABLE: stocks
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:Get*
-        - dynamodb:Scan*
-        - dynamodb:PutItem
+        - dynamodb:*
       Resource: '*'
 custom:
     autoswagger:
@@ -25,9 +26,6 @@ custom:
 functions:
   getProductsList:
     handler: handler.getProductsList
-    environment:
-      PRODUCTS_TABLE: products
-      STOCKS_TABLE: stocks
     events:
       - http:
           method: get
@@ -45,9 +43,6 @@ functions:
 
   getProductsById:
     handler: handler.getProductsById
-    environment:
-      PRODUCTS_TABLE: products
-      STOCKS_TABLE: stocks
     events:
       - http:
           path: products/{productId}
@@ -68,9 +63,6 @@ functions:
 
   createProduct:
     handler: handler.createProduct
-    environment:
-      PRODUCTS_TABLE: products
-      STOCKS_TABLE: stocks
     events:
       - http:
           path: products
