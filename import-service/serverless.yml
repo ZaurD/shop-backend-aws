@@ -10,11 +10,14 @@ provider:
   runtime: nodejs12.x
   region: eu-west-1
   iamRoleStatements:
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
+        - s3:ListBucket
         - s3:GetObject
         - s3:PutObject
-      Resource: "arn:aws:s3:::import-service-s3bucket/*"
+      Resource:
+        - arn:aws:s3:::import-service-s3bucket/
+        - arn:aws:s3:::import-service-s3bucket/*
 functions:
   importProductsFile:
     handler: handler.importProductsFile
@@ -27,5 +30,12 @@ functions:
             parameters:
               querystrings:
                 name: true
-
-
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: import-service-s3bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
