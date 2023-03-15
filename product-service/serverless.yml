@@ -18,10 +18,19 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:*
+        - sqs:*
       Resource: '*'
+
 custom:
     autoswagger:
         apiType: 'http'
+  
+resources:
+  Resources:
+    CatalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
         
 functions:
   getProductsList:
@@ -80,3 +89,13 @@ functions:
               description: 'Error creating product',
             }
           }
+        
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn: 
+            Fn::GetAtt:
+              - CatalogItemsQueue
+              - Arn

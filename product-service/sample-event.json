@@ -1,0 +1,13 @@
+{
+    "Records": [
+      {
+        "messageId": "1",
+        "body": "{\"id\":\"001\",\"title\":\"The Alchemist's Secret\",\"author\":\"Scott Mariani\",\"count\":2,\"description\":\"A thriller novel that follows ex-SAS soldier Ben Hope as he tries to uncover the truth behind a mysterious alchemist's manuscript.\",\"price\":10.99}"
+      },
+      {
+        "messageId": "2",
+        "body": "{\"id\":\"002\",\"title\":\"The Da Vinci Code\",\"author\":\"Dan Brown\",\"count\":5,\"description\":\"A novel that follows symbologist Robert Langdon and cryptologist Sophie Neveu as they investigate a murder in the Louvre Museum.\",\"price\":8.99}"
+      }
+    ]
+  }
+  
