@@ -1,10 +1,11 @@
 const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
+const sns = new AWS.SNS();
 
 export const catalogBatchProcess = async (event) => {
   try {
-    const products = event.Records.map(record => JSON.parse(record.body));
-    const putRequests = products.map(product => ({
+    const product = event.Records.map(record => JSON.parse(record.body));
+    const putRequests = product.map(product => ({
       PutRequest: {
         Item: {
           id: product.id,
@@ -21,7 +22,7 @@ export const catalogBatchProcess = async (event) => {
       }
     };
 
-    const stockPutRequests = products.map(product => ({
+    const stockPutRequests = product.map(product => ({
       PutRequest: {
         Item: {
           product_id: product.id,
@@ -34,13 +35,26 @@ export const catalogBatchProcess = async (event) => {
         [process.env.STOCKS_TABLE]: stockPutRequests
       }
     };
+
     await dynamodb.batchWrite(params).promise();
     await dynamodb.batchWrite(stockParams).promise();
-    console.log(`${products.length} products were created successfully`);
+
+    const snsParams = {
+      Message: `Created ${JSON.stringify(product)} product`,
+      TopicArn: process.env.SNS_ARN,
+      MessageAttributes: {
+        price: {
+          DataType: "Number",
+          StringValue: String(product[0].price),
+        },
+      }
+    };
+    
+    await sns.publish(snsParams).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: `${products.length} products were created successfully`
+        message: `Product were created successfully`
       })
     };
   } catch (error) {
@@ -48,7 +62,7 @@ export const catalogBatchProcess = async (event) => {
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: 'An error occurred while creating products'
+        message: 'An error occurred while creating product'
       })
     };
   }
