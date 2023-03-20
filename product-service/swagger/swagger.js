@@ -2,7 +2,7 @@
             module.exports = {
   "swagger": "2.0",
   "info": {
-    "title": "product-service",
+    "title": "products-service",
     "version": "1"
   },
   "paths": {
@@ -24,6 +24,35 @@
             "schema": {
               "$ref": "#/definitions/Product"
             }
+          },
+          "500": {
+            "description": "An error occurred while retrieving products."
+          }
+        }
+      },
+      "post": {
+        "summary": "createProduct",
+        "description": "",
+        "operationId": "createProduct.post.products",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Product created successfully",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          "400": {
+            "description": "Error creating product, product data is invalid"
+          },
+          "500": {
+            "description": "Error creating product"
           }
         }
       }
@@ -56,6 +85,9 @@
           },
           "404": {
             "description": "Product not found"
+          },
+          "500": {
+            "description": "Error getting product"
           }
         }
       }

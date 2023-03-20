@@ -1,6 +1,6 @@
 service: products-service
 
-frameworkVersion: '3'
+frameworkVersion: '3.28.1'
 
 plugins:
   - serverless-auto-swagger
@@ -11,9 +11,55 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: eu-west-1
+  environment:
+    PRODUCTS_TABLE: products
+    STOCKS_TABLE: stocks
+    SNS_ARN:
+      Ref: "createProductTopic"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+        - sqs:*
+        - sns:*
+      Resource: '*'
+
 custom:
     autoswagger:
         apiType: 'http'
+  
+resources:
+  Resources:
+    CatalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    
+    createProductTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        TopicName: "createProductTopic"
+
+    productEmailSubscription:
+      Type: "AWS::SNS::Subscription"
+      Properties:
+        Protocol: "email"
+        TopicArn:
+          Ref: "createProductTopic"
+        Endpoint: "zevs.diy@gmail.com"
+        FilterPolicyScope: "MessageAttributes"
+        FilterPolicy: { price: [{ numeric: ["<=", 100] }] }
+    
+    productEmailSubscription2:
+      Type: "AWS::SNS::Subscription"
+      Properties:
+        Protocol: "email"
+        TopicArn:
+          Ref: "createProductTopic"
+        Endpoint: "zaur.developer@gmail.com"
+        FilterPolicyScope: "MessageAttributes"
+        FilterPolicy: { price: [{ numeric: [">", 100] }] }
+
 functions:
   getProductsList:
     handler: handler.getProductsList
@@ -26,6 +72,9 @@ functions:
             200: {
               description: 'successful Api Response',
               bodyType: 'Product',
+            },
+            500: {
+              description: 'An error occurred while retrieving products.',
             }
           }  
 
@@ -34,8 +83,8 @@ functions:
     events:
       - http:
           path: products/{productId}
-          method: get
           cors: true
+          method: get
           responseData: {
             200: {
               description: 'successful Api Response',
@@ -43,6 +92,38 @@ functions:
             },
             404: {
               description: 'Product not found'
+            },
+            500: {
+              description: 'Error getting product'
             }
           }  
 
+  createProduct:
+    handler: handler.createProduct
+    events:
+      - http:
+          path: products
+          method: post
+          cors: true
+          responseData: {
+            200: {
+              description: 'Product created successfully',
+              bodyType: 'Product',
+            },
+            400: {
+              description: 'Error creating product, product data is invalid',
+            },
+            500: {
+              description: 'Error creating product',
+            }
+          }
+        
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn: 
+            Fn::GetAtt:
+              - CatalogItemsQueue
+              - Arn
