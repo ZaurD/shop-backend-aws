@@ -14,15 +14,52 @@ provider:
   environment:
     PRODUCTS_TABLE: products
     STOCKS_TABLE: stocks
+    SNS_ARN:
+      Ref: "createProductTopic"
   iamRoleStatements:
     - Effect: Allow
       Action:
         - dynamodb:*
+        - sqs:*
+        - sns:*
       Resource: '*'
+
 custom:
     autoswagger:
         apiType: 'http'
-        
+  
+resources:
+  Resources:
+    CatalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    
+    createProductTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        TopicName: "createProductTopic"
+
+    productEmailSubscription:
+      Type: "AWS::SNS::Subscription"
+      Properties:
+        Protocol: "email"
+        TopicArn:
+          Ref: "createProductTopic"
+        Endpoint: "zevs.diy@gmail.com"
+        FilterPolicyScope: "MessageAttributes"
+        FilterPolicy: { price: [{ numeric: ["<=", 100] }] }
+    
+    productEmailSubscription2:
+      Type: "AWS::SNS::Subscription"
+      Properties:
+        Protocol: "email"
+        TopicArn:
+          Ref: "createProductTopic"
+        Endpoint: "zaur.developer@gmail.com"
+        FilterPolicyScope: "MessageAttributes"
+        FilterPolicy: { price: [{ numeric: [">", 100] }] }
+
 functions:
   getProductsList:
     handler: handler.getProductsList
@@ -80,3 +117,13 @@ functions:
               description: 'Error creating product',
             }
           }
+        
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn: 
+            Fn::GetAtt:
+              - CatalogItemsQueue
+              - Arn
