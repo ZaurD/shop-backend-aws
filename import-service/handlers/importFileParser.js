@@ -2,7 +2,10 @@ import * as AWS from "aws-sdk";
 import csv from "csv-parser";
 
 const s3 = new AWS.S3();
+const sqs = new AWS.SQS();
 const bucketName = "import-service-s3bucket";
+const queueUrl =
+  "https://sqs.eu-west-1.amazonaws.com/420915147206/catalogItemsQueue";
 
 export const importFileParser = async (event) => {
   try {
@@ -18,9 +21,18 @@ export const importFileParser = async (event) => {
 
       for await (const chunk of readable) {
         result.push(chunk);
-      }
 
-      console.log("importFileParser, csv parsed", result);
+        try {
+          await sqs
+            .sendMessage({
+              QueueUrl: queueUrl,
+              MessageBody: JSON.stringify(chunk),
+            })
+            .promise();
+        } catch (err) {
+          console.error(err);
+        }
+      }
 
       await s3
         .copyObject({
