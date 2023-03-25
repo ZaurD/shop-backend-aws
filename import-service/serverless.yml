@@ -4,7 +4,7 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-webpack
-
+  
 provider:
   name: aws
   runtime: nodejs12.x
@@ -27,11 +27,28 @@ functions:
       - http:
           method: get
           path: /import
-          cors: true
+          cors:
+            origins:
+              - https://d10oh2u1zxq3h3.cloudfront.net
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - X-Amzn-Trace-Id
+              - pragma
+              - cache-control
+            allowCredentials: true
           request:
             parameters:
               querystrings:
                 name: true
+          authorizer: 
+            arn: arn:aws:lambda:${aws:region}:${aws:accountId}:function:authorization-service-dev-basicAuthorizer
+            type: token
+            resultTtlInSeconds: 0
   importFileParser:
     handler: handler.importFileParser
     events:

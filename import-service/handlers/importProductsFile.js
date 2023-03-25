@@ -26,10 +26,10 @@ export const importProductsFile = async (event) => {
 
     return {
       statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": true,
-      },
+        headers: {
+          "Access-Control-Allow-Origin": "https://d10oh2u1zxq3h3.cloudfront.net",
+          "Access-Control-Allow-Credentials": true
+        },
       body: JSON.stringify({ url: signedUrl }),
     };
   } catch (error) {
