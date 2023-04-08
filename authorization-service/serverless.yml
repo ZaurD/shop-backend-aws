@@ -1,0 +1,20 @@
+service: authorization-service
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  environment:
+    ZaurD: ${env:ZaurD}
+
+useDotenv: true
+
+functions:
+  basicAuthorizer:
+    handler: handler.basicAuthorizer
+
